@@ -14,11 +14,11 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table
+@Table(name = "blog_user")
 
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer userId;
     @Size(min = 3, max = 32)
     private String login;
@@ -34,7 +34,7 @@ public class User {
     private short status;
     @ToString.Exclude
     @Lob
-    @Column(columnDefinition = "MEDIUMBLOB")
+
     private String avatar;
 
     @ToString.Exclude
