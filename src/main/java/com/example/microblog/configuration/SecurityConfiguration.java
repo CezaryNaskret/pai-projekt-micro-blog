@@ -43,9 +43,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
-                .usersByUsernameQuery("SELECT u.login,u.passhash,u.status FROM blog_user u WHERE u.login=?")
+                .usersByUsernameQuery("SELECT u.login,u.passhash,u.status FROM user u WHERE u.login=?")
                 .authoritiesByUsernameQuery(
-                        "SELECT u.login, u.status FROM blog_user u  WHERE u.login=?"
+                        "SELECT u.login, u.status FROM user u  WHERE u.login=?"
                 )
                 .dataSource(dataSource)
                 .passwordEncoder(new BCryptPasswordEncoder());
