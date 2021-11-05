@@ -21,6 +21,7 @@ public class UserService {
 
     public void insertUser(User user){
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        user.setRole("ROLE_USER");
         userRepository.save(user);
     }
 
@@ -33,7 +34,7 @@ public class UserService {
         return userOpt.orElseGet(User::new);
     }
 
-    public User findUserByName(String name) {
+    public Optional<User> findUserByName(String name) {
         return userRepository.findUserByDescriptiveName(name);
     }
 

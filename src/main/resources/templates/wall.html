@@ -39,12 +39,12 @@
                     <a class="nav-link" th:href="@{/logout}">Wyloguj się</a>
                 </li>
 
-                <li class="nav-item" th:if="${isAuth != null && follow == false && isAuth.getName() != user.getLogin()}">
+                <li class="nav-item" th:if="${isAuth != null && isAuth.getAuthorities().toString() != '[ROLE_ADMIN]' && follow == false && isAuth.getName() != user.getLogin()}">
                     <form th:action="@{'/follow' (userName=${user.getUniqueName()})}" method="POST">
                         <input class="nav-link btn btn-link" type="submit" value="Obserwuj">
                     </form>
                 </li>
-                <li class="nav-item" th:if="${isAuth != null && follow == true && isAuth.getName() != user.getLogin()}">
+                <li class="nav-item" th:if="${isAuth != null && isAuth.getAuthorities().toString() != '[ROLE_ADMIN]' && follow == true && isAuth.getName() != user.getLogin()}">
                     <form th:action="@{'/unfollow' (userName=${user.getUniqueName()})}" method="POST">
                         <input class="nav-link btn btn-link" type="submit" value="Przestań obserwować">
                     </form>
@@ -72,6 +72,12 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
+            <form th:if="${isAuth != null && isAuth.getAuthorities().toString() == '[ROLE_ADMIN]'}"
+                  th:action="@{/changeUserStatus(userName=${user.uniqueName})}" method="POST"
+                  th:with="value=*{user.status == 1} ? 'Zablokuj użytkownika' : 'Odblokuj użytkownika'">
+                <input class="btn btn-primary btn2" type="submit" th:name="update" th:value="${value}"/>
+            </form>
+
             <div class="post-preview" th:each="post : ${posts}">
                 <a th:href="@{'/post/'+ ${post.getPostId()}}">
                     <h2 class="post-title" th:text="${post.title}">Tytuł postu</h2>

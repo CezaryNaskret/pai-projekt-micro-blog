@@ -1,5 +1,6 @@
 package com.example.microblog.controller;
 
+import com.example.microblog.model.Post;
 import com.example.microblog.model.User;
 import com.example.microblog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Optional;
 
 @Controller
 public class UserController {
@@ -33,7 +35,7 @@ public class UserController {
             @RequestParam String userName
     ) {
         User user = userService.findUserByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
-        user.getFollow().add(userService.findUserByName(userName));
+        userService.findUserByName(userName).ifPresent(u -> user.getFollow().add(u));
         userService.updateUser(user);
         return "redirect:/user=" + userName;
     }
@@ -43,7 +45,7 @@ public class UserController {
             @RequestParam String userName
     ) {
         User user = userService.findUserByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
-        user.getFollow().remove(userService.findUserByName(userName));
+        userService.findUserByName(userName).ifPresent(u -> user.getFollow().remove(u));
         userService.updateUser(user);
         return "redirect:/user=" + userName;
     }
@@ -79,5 +81,23 @@ public class UserController {
     @PostMapping(params = "cancel", path = "/editUser")
     public String editUserCancel() {
         return "redirect:/myWall";
+    }
+
+    // ---------------------- FOR ADMIN -------------
+
+    @PostMapping(path = "/changeUserStatus")
+    public String changeStatus(@RequestParam(required = true) String userName, Model model){
+        Optional<User> userOpt = userService.findUserByName(userName);
+        if(userOpt.isPresent()){
+            User user = userOpt.get();
+            if(user.getStatus() == 1){
+                user.setStatus((short) 0);
+            }
+            else if(user.getStatus() == 0){
+                user.setStatus((short) 1);
+            }
+            userService.updateUser(user);
+        }
+        return "redirect:/user=" + userName;
     }
 }

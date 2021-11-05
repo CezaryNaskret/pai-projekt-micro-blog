@@ -20,6 +20,7 @@ public class Comment {
     @Size(min = 3, max = 140)
     private String content;
     private LocalDate date = LocalDate.now();
+    private short status;
 
     @ManyToOne(
             fetch = FetchType.EAGER,                // FetchType.EAGER - zachłanny

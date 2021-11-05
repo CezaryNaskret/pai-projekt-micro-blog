@@ -13,9 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -36,12 +34,22 @@ public class WallController {
         User user = userService.findUserByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
         model.addAttribute("user", user);
 
-        List<Post> posts = user.getFollow()
-                .stream()
-                .map(postService::getAllUsersPosts)
-                .flatMap(Collection::stream)
-                .sorted(Comparator.comparing(Post::getDate))
-                .collect(Collectors.toList());
+        List<Post> posts = null;
+        if(user.getRole().equals("ROLE_USER")){
+            posts = user.getFollow()
+                    .stream()
+                    .map(postService::getAllUsersPosts)
+                    .flatMap(Collection::stream)
+                    .filter(post -> post.getStatus() == 1)
+                    .sorted(Comparator.comparing(Post::getDate))
+                    .collect(Collectors.toList());
+        }
+        else if(user.getRole().equals("ROLE_ADMIN")){
+            posts = postService.getPosts();
+        }
+        else {
+            posts = new ArrayList<Post>();
+        }
         model.addAttribute("posts", posts);
 
         List<Integer> comments = posts.stream()
@@ -56,10 +64,12 @@ public class WallController {
 
     @GetMapping("/user={userName}")
     public String getUser(@PathVariable("userName") String userName, Model model, Authentication auth) {
-        User user = userService.findUserByName(userName);
+        Optional<User> userOpt = userService.findUserByName(userName);
         model.addAttribute("isAuth", auth);
-        if(user != null) {
-            model.addAttribute("posts", postService.getAllUsersPosts(user));
+        if(userOpt.isPresent() && (userOpt.get().getStatus() == 1 || auth != null && auth.getAuthorities().toString().equals("[ROLE_ADMIN]"))) {
+            User user = userOpt.get();
+            model.addAttribute("posts", postService.getAllUsersPosts(user)
+                    .stream().filter(post -> post.getStatus() == 1).collect(Collectors.toList()));
             model.addAttribute("user", user);
             if(auth != null){
                 User visitor = userService.findUserByLogin(auth.getName());

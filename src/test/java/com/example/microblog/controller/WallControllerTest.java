@@ -67,7 +67,7 @@ public class WallControllerTest {
 
     @Test
     public void getUserTest() throws Exception {
-        Mockito.when(userService.findUserByName("testUser")).thenReturn(new User());
+        Mockito.when(userService.findUserByName("testUser").get()).thenReturn(new User());
         Mockito.when(userService.findUserByLogin(anyString())).thenReturn(new User());
 
         mockMvc.perform(MockMvcRequestBuilders

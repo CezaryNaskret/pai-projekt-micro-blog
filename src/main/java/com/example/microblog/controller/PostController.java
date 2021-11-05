@@ -18,6 +18,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 public class PostController {
@@ -40,7 +41,10 @@ public class PostController {
             Optional<Post> postOpt = postService.getPost(postId);
             post = postOpt.orElseGet(Post::new);
         }
-        else post = new Post();
+        else {
+            post = new Post();
+            post.setStatus((short) 1);
+        }
         model.addAttribute("post", post);
         return "createPost";
     }
@@ -83,10 +87,16 @@ public class PostController {
             Authentication auth
     ) {
         Optional<Post> postOpt = postService.getPost(postId);
-        if(postOpt.isPresent()){
+        if(postOpt.isPresent() && (postOpt.get().getStatus() == 1 || (auth != null && auth.getAuthorities().toString().equals("[ROLE_ADMIN]")))){
             model.addAttribute("post", postOpt.get());
             model.addAttribute("isAuth", auth);
-            model.addAttribute("comments", commentService.getComments(postOpt.get()));
+
+            List<Comment> comments = commentService.getComments(postOpt.get());
+            if(!auth.getAuthorities().toString().equals("[ROLE_ADMIN]")){
+                comments = comments.stream().filter(com -> com.getStatus() == 1).collect(Collectors.toList());
+            }
+            model.addAttribute("comments", comments);
+
             Optional<Comment> commentOpt = commentService.getComment(commentId);
             if (commentOpt.isPresent()) {
                 model.addAttribute("comment", commentOpt.get());
@@ -143,6 +153,41 @@ public class PostController {
         model.addAttribute("noResults", posts.isEmpty());
         model.addAttribute("isAuth", auth);
         return "searchResult";
+    }
+
+    // ---------------------- FOR ADMIN -------------
+
+    @PostMapping(path = "/changePostStatus")
+    public String changePostStatus(@RequestParam(required = true) Integer postId, Model model){
+        Optional<Post> postOpt = postService.getPost(postId);
+        if(postOpt.isPresent()){
+            Post post = postOpt.get();
+            if(post.getStatus() == 1){
+                post.setStatus((short) 0);
+            }
+            else if(post.getStatus() == 0){
+                post.setStatus((short) 1);
+            }
+            postService.setPost(post);
+        }
+        return "redirect:/post/" + postId;
+    }
+
+    @PostMapping(path = "/changeCommentStatus")
+    public String changeCommentStatus(@RequestParam(required = true) Integer commentId, Model model){
+        Optional<Comment> commentOpt = commentService.getComment(commentId);
+        if(commentOpt.isPresent()){
+            Comment comment = commentOpt.get();
+            if(comment.getStatus() == 1){
+                comment.setStatus((short) 0);
+            }
+            else if(comment.getStatus() == 0){
+                comment.setStatus((short) 1);
+            }
+            commentService.setComment(comment);
+            return "redirect:/post/" + comment.getPost().getPostId();
+        }
+        return "redirect:/myWall";
     }
 }
 

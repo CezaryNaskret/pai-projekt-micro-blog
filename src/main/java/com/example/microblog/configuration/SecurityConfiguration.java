@@ -23,9 +23,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
         httpSecurity
                 .authorizeRequests()
                     // żądania wymagające logowania
-                    .antMatchers("/createPost").authenticated()
-                    .antMatchers("/myWall").authenticated()
-                    .antMatchers("/editUser").authenticated()
+                .antMatchers("/createPost").hasAnyAuthority("ROLE_USER")
+                .antMatchers("/post").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                .antMatchers("/createComment").hasAnyAuthority("ROLE_USER")
+                .antMatchers("/search").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                .antMatchers("/follow").hasAnyAuthority("ROLE_USER")
+                .antMatchers("/unfollow").hasAnyAuthority("ROLE_USER")
+                .antMatchers("/editUser").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                .antMatchers("/myWall").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                .antMatchers("/changeCommentStatus").hasAnyAuthority("ROLE_ADMIN")
+                .antMatchers("/changePostStatus").hasAnyAuthority("ROLE_ADMIN")
+                .antMatchers("/changeUserStatus").hasAnyAuthority("ROLE_ADMIN")
+//                    .antMatchers("/createPost").authenticated()
+//                    .antMatchers("/myWall").authenticated()
+//                    .antMatchers("/editUser").authenticated()
                     .anyRequest().permitAll()
                     .and().csrf().disable()
                 .formLogin()
@@ -45,7 +56,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
         auth.jdbcAuthentication()
                 .usersByUsernameQuery("SELECT u.login,u.passhash,u.status FROM user u WHERE u.login=?")
                 .authoritiesByUsernameQuery(
-                        "SELECT u.login, u.status FROM user u  WHERE u.login=?"
+                        "SELECT u.login, u.role FROM user u  WHERE u.login=?"
                 )
                 .dataSource(dataSource)
                 .passwordEncoder(new BCryptPasswordEncoder());

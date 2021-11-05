@@ -33,7 +33,7 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/myWall}">Strona główna</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:if="${user.role == 'ROLE_USER'}">
                     <a class="nav-link" th:href="@{/createPost}">Utwórz post</a>
                 </li>
                 <li class="nav-item">

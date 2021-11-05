@@ -22,6 +22,7 @@ public class Post {
     @Size(min = 3, max = 40)
     private String title;
     private LocalDate date = LocalDate.now();
+    private short status;
 
     @ManyToOne(
             fetch = FetchType.EAGER,                // FetchType.EAGER - zachłanny

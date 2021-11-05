@@ -10409,3 +10409,11 @@ header.masthead .post-heading .meta a {
 .btn2{
     padding: 10px;
 }
+
+.btn3{
+  font-size: 14px;
+  padding: 0;
+  letter-spacing: 1px;
+  background-color: transparent;
+  border: 1px solid transparent;
+}

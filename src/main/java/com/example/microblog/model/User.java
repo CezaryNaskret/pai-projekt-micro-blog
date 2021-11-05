@@ -15,7 +15,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table
-
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +35,7 @@ public class User {
     @Lob
     @Column(columnDefinition = "MEDIUMBLOB")
     private String avatar;
+    private String role;
 
     @ToString.Exclude
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)

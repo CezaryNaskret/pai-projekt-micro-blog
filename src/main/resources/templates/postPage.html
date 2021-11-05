@@ -75,6 +75,12 @@
             <p th:text="${post.content}">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut, tenetur natus doloremque laborum quos iste ipsum rerum obcaecati impedit odit illo dolorum ab tempora nihil dicta earum fugiat. Temporibus, voluptatibus.</p>
             <hr />
 
+            <form th:if="${isAuth != null && isAuth.getAuthorities().toString() == '[ROLE_ADMIN]'}"
+                    th:action="@{/changePostStatus(postId=${post.postId})}" method="POST"
+                  th:with="value=*{post.status == 1} ? 'Zablokuj post' : 'Odblokuj post'">
+                <input class="btn btn-primary btn2" type="submit" th:name="update" th:value="${value}"/>
+            </form>
+
             <!-- Comments form-->
             <a id="comment"></a>
             <div class="card my-4">
@@ -111,6 +117,11 @@
                         <a th:href="@{'/post/'+ ${post.postId} + '#comment' (commentId=${com.commentId})}">Edytuj</a>
                         <a th:href="@{'/post/'+ ${post.postId} + '#comment' (commentId=${com.commentId},delete='true')}">Usuń</a>
                     </span>
+                    <form th:if="${isAuth != null && isAuth.getAuthorities().toString() == '[ROLE_ADMIN]'}"
+                          th:action="@{/changeCommentStatus(commentId=${com.commentId})}" method="POST"
+                          th:with="value=*{com.status == 1} ? 'Zablokuj komentarz' : 'Odblokuj komentarz'">
+                        <input class="btn3 btn-link" type="submit" th:value="${value}">
+                    </form>
                     <p th:text="${com.content}">treść komentarza</p>
                 </div>
             </div>
