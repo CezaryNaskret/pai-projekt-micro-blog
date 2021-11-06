@@ -92,7 +92,7 @@ public class PostController {
             model.addAttribute("isAuth", auth);
 
             List<Comment> comments = commentService.getComments(postOpt.get());
-            if(!auth.getAuthorities().toString().equals("[ROLE_ADMIN]")){
+            if(auth!=null && !auth.getAuthorities().toString().equals("[ROLE_ADMIN]")){
                 comments = comments.stream().filter(com -> com.getStatus() == 1).collect(Collectors.toList());
             }
             model.addAttribute("comments", comments);
@@ -158,7 +158,7 @@ public class PostController {
     // ---------------------- FOR ADMIN -------------
 
     @PostMapping(path = "/changePostStatus")
-    public String changePostStatus(@RequestParam(required = true) Integer postId, Model model){
+    public String changePostStatus(@RequestParam Integer postId){
         Optional<Post> postOpt = postService.getPost(postId);
         if(postOpt.isPresent()){
             Post post = postOpt.get();
@@ -174,7 +174,7 @@ public class PostController {
     }
 
     @PostMapping(path = "/changeCommentStatus")
-    public String changeCommentStatus(@RequestParam(required = true) Integer commentId, Model model){
+    public String changeCommentStatus(@RequestParam Integer commentId){
         Optional<Comment> commentOpt = commentService.getComment(commentId);
         if(commentOpt.isPresent()){
             Comment comment = commentOpt.get();

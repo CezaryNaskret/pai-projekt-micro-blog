@@ -1,7 +1,10 @@
 package com.example.microblog.controller;
 
+import com.example.microblog.model.Comment;
 import com.example.microblog.model.Post;
 import com.example.microblog.model.User;
+import com.example.microblog.service.CommentService;
+import com.example.microblog.service.PostService;
 import com.example.microblog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -18,14 +21,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
 public class UserController {
     UserService userService;
+    PostService postService;
+    CommentService commentService;
     @Autowired
-    UserController (UserService userService){
+    UserController (UserService userService, PostService postService, CommentService commentService){
         this.userService = userService;
+        this.postService = postService;
+        this.commentService = commentService;
     }
 
     // ------------------------ FOLLOW ------------------
@@ -86,11 +94,15 @@ public class UserController {
     // ---------------------- FOR ADMIN -------------
 
     @PostMapping(path = "/changeUserStatus")
-    public String changeStatus(@RequestParam(required = true) String userName, Model model){
+    public String changeStatus(@RequestParam String userName){
         Optional<User> userOpt = userService.findUserByName(userName);
         if(userOpt.isPresent()){
             User user = userOpt.get();
             if(user.getStatus() == 1){
+                List<Post> posts = postService.getAllUsersPosts(user);
+                List<Comment> comments = commentService.getAllUsersComments(user);
+                posts.stream().peek(p -> p.setStatus((short)0)).forEach(p -> postService.setPost(p));
+                comments.stream().peek(c -> c.setStatus((short)0)).forEach(c -> commentService.setComment(c));
                 user.setStatus((short) 0);
             }
             else if(user.getStatus() == 0){

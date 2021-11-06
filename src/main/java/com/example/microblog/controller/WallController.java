@@ -34,7 +34,7 @@ public class WallController {
         User user = userService.findUserByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
         model.addAttribute("user", user);
 
-        List<Post> posts = null;
+        List<Post> posts;
         if(user.getRole().equals("ROLE_USER")){
             posts = user.getFollow()
                     .stream()
@@ -48,7 +48,7 @@ public class WallController {
             posts = postService.getPosts();
         }
         else {
-            posts = new ArrayList<Post>();
+            posts = new ArrayList<>();
         }
         model.addAttribute("posts", posts);
 
@@ -69,7 +69,9 @@ public class WallController {
         if(userOpt.isPresent() && (userOpt.get().getStatus() == 1 || auth != null && auth.getAuthorities().toString().equals("[ROLE_ADMIN]"))) {
             User user = userOpt.get();
             model.addAttribute("posts", postService.getAllUsersPosts(user)
-                    .stream().filter(post -> post.getStatus() == 1).collect(Collectors.toList()));
+                    .stream()
+                    .filter(post -> auth.getAuthorities().toString().equals("[ROLE_ADMIN]") || post.getStatus() == 1 )
+                    .collect(Collectors.toList()));
             model.addAttribute("user", user);
             if(auth != null){
                 User visitor = userService.findUserByLogin(auth.getName());

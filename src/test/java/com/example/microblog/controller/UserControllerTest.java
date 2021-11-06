@@ -1,6 +1,8 @@
 package com.example.microblog.controller;
 
 import com.example.microblog.model.User;
+import com.example.microblog.service.CommentService;
+import com.example.microblog.service.PostService;
 import com.example.microblog.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -30,6 +32,8 @@ public class UserControllerTest {
     @Mock
     private UserController userController;
     UserService userService;
+    PostService postService;
+    CommentService commentService;
     Authentication authentication;
 
     @Before
@@ -46,7 +50,9 @@ public class UserControllerTest {
         Mockito.when(authentication.getName()).thenReturn("anyString()");
 
         userService = mock(UserService.class);
-        userController = new UserController(userService);
+        postService = mock(PostService.class);
+        commentService = mock(CommentService.class);
+        userController = new UserController(userService, postService, commentService);
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
                 .setViewResolvers(viewResolver)
                 .build();

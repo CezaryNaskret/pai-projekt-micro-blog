@@ -84,7 +84,7 @@ public class RegisterController {
         if(user.getUserId() != null){
             String password = getRandomString(); // generujemy hasło
             System.out.println("New Password: " + password); // wyświetlamy je
-            //sendMessage(email, password); // wysyłame email z nowym hasłem
+            //sendMessage(email, password); // wysyłam email z nowym hasłem
             user.setPassword(password);
             userService.insertUser(user); // zapisujemy nowe hasło
             redirectAttributes.addAttribute("email", email);

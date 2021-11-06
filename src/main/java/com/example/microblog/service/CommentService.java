@@ -2,6 +2,7 @@ package com.example.microblog.service;
 
 import com.example.microblog.model.Comment;
 import com.example.microblog.model.Post;
+import com.example.microblog.model.User;
 import com.example.microblog.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,10 @@ public class CommentService {
     @Autowired
     public CommentService(CommentRepository commentRepository){
         this.commentRepository = commentRepository;
+    }
+
+    public List<Comment> getAllUsersComments(User author){
+        return commentRepository.findAllByAuthorOrderByDateDesc(author);
     }
 
     public List<Comment> getComments(Post post){
