@@ -1,5 +1,6 @@
 package com.example.microblog.controller;
 
+import com.example.microblog.model.Post;
 import com.example.microblog.model.User;
 import com.example.microblog.service.CommentService;
 import com.example.microblog.service.PostService;
@@ -56,7 +57,9 @@ public class WallControllerTest {
 
     @Test
     public void homeTest() throws Exception {
-        Mockito.when(userService.findUserByLogin(anyString())).thenReturn(new User());
+        User testUser = new User();
+        testUser.setRole("ROLE_USER");
+        Mockito.when(userService.findUserByLogin(anyString())).thenReturn(testUser);
 
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/myWall")
@@ -67,7 +70,9 @@ public class WallControllerTest {
 
     @Test
     public void getUserTest() throws Exception {
-        Mockito.when(userService.findUserByName("testUser").get()).thenReturn(new User());
+        User testUser = new User();
+        testUser.setStatus((short)1);
+        Mockito.when(userService.findUserByName("testUser")).thenReturn(java.util.Optional.of(testUser));
         Mockito.when(userService.findUserByLogin(anyString())).thenReturn(new User());
 
         mockMvc.perform(MockMvcRequestBuilders

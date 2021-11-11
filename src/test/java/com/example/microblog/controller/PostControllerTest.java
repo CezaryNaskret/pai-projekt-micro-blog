@@ -90,12 +90,23 @@ public class PostControllerTest {
     //------------------- POST PAGE ----------------------
 
     @Test
-    public void getPostTest() throws Exception {
-        Mockito.when(postService.getPost(1)).thenReturn(java.util.Optional.of(new Post()));
+    public void getUnlockedPostTest() throws Exception {
+        Post testPost = new Post();
+        testPost.setStatus((short)1);
+        Mockito.when(postService.getPost(1)).thenReturn(java.util.Optional.of(testPost));
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/post/{postId}", 1))
                 .andExpect(status().isOk())
                 .andExpect(view().name("postPage"));
+    }
+
+    @Test
+    public void getBlockedPostTest() throws Exception {
+        Mockito.when(postService.getPost(1)).thenReturn(java.util.Optional.of(new Post()));
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/post/{postId}", 1))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/myWall"));
     }
 
     //-------------------- COMMENT -----------------------------
@@ -134,5 +145,23 @@ public class PostControllerTest {
                         .param("sentence", "userInput"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("searchResult"));
+    }
+
+    @Test
+    public void changePostStatusTest() throws Exception{
+        mockMvc.perform(MockMvcRequestBuilders
+                    .post("/changePostStatus")
+                        .param("postId", "1"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/post/1"));
+    }
+
+    @Test
+    public void changeCommentStatusTest() throws Exception{
+        mockMvc.perform(MockMvcRequestBuilders
+                 .post("/changeCommentStatus")
+                        .param("commentId", "1"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/myWall"));
     }
 }
